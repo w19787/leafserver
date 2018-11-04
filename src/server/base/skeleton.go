@@ -4,9 +4,11 @@ import (
 	"github.com/name5566/leaf/chanrpc"
 	"github.com/name5566/leaf/module"
 	"server/conf"
+	"fmt"
 )
 
 func NewSkeleton() *module.Skeleton {
+	fmt.Println("new Skeleton")
 	skeleton := &module.Skeleton{
 		GoLen:              conf.GoLen,
 		TimerDispatcherLen: conf.TimerDispatcherLen,

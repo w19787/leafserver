@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/name5566/leaf/module"
 	"server/base"
+	"fmt"
 )
 
 var (
@@ -15,6 +16,7 @@ type Module struct {
 }
 
 func (m *Module) OnInit() {
+	fmt.Println("internal module onInit")
 	m.Skeleton = skeleton
 }
 
