@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package msg;
+
+message GameOp {
+	int op = 1;
+	int param = 2;
+	string extra = 3;
+}
