@@ -7,5 +7,5 @@ import (
 var Processor = protobuf.NewProcessor()
 
 func init() {
-	Processor.Register(&Hello{})
+	Processor.Register(&GameOp{})
 }

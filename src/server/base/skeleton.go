@@ -1,10 +1,10 @@
 package base
 
 import (
+	"fmt"
 	"github.com/name5566/leaf/chanrpc"
 	"github.com/name5566/leaf/module"
 	"server/conf"
-	"fmt"
 )
 
 func NewSkeleton() *module.Skeleton {
@@ -15,6 +15,7 @@ func NewSkeleton() *module.Skeleton {
 		AsynCallLen:        conf.AsynCallLen,
 		ChanRPCServer:      chanrpc.NewServer(conf.ChanRPCLen),
 	}
+	fmt.Println("NewSkeleton handler: ", skeleton)
 	skeleton.Init()
 	return skeleton
 }

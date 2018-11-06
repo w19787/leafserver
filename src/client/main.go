@@ -1,22 +1,22 @@
 package main
 
 import (
-	"server/msg"
+	// "bufio"
 	"encoding/binary"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"github.com/name5566/leaf/network/protobuf"
 	"github.com/name5566/leaf/log"
+	"github.com/name5566/leaf/network/protobuf"
 	"net"
-	"bufio"
-	"os"
+	// "os"
+	"server/msg"
 )
 
-func encodeHelloMsg(msgBody string) []byte{
+func encodeGameOpMsg(op int32) []byte {
 	var Processor = protobuf.NewProcessor()
-	Processor.Register(&msg.Hello{})
+	Processor.Register(&msg.GameOp{})
 
-	data, err := Processor.Marshal(&msg.Hello{Name: proto.String(msgBody)})
+	data, err := Processor.Marshal(&msg.GameOp{Op: op, Param: 88, Extra: "99"})
 	if err != nil {
 		log.Fatal("marshaling error: ", err)
 	}
@@ -33,14 +33,14 @@ func encodeHelloMsg(msgBody string) []byte{
 	return m
 }
 
-func decodeHelloMsg(msgData []byte, n int) string{
-	recv := &msg.Hello{}
+func decodeGameOpMsg(msgData []byte, n int) int32 {
+	recv := &msg.GameOp{}
 	err := proto.Unmarshal(msgData[4:n], recv)
 	if err != nil {
 		log.Fatal("unmarshaling error: ", err)
 	}
 
-	return recv.GetName()
+	return recv.GetOp()
 }
 
 func main() {
@@ -49,12 +49,16 @@ func main() {
 		panic(err)
 	}
 
-	for{
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Enter text: ")
-		text, _ := reader.ReadString('\n')
+	for {
+		fmt.Print("Enter Op: ")
+		var op int32
+		_, err := fmt.Scanf("%d", &op)
 
-		m := encodeHelloMsg(text)
+		if err != nil {
+			log.Fatal("read std error:", err)
+		}
+
+		m := encodeGameOpMsg(op)
 
 		// 发送消息
 		conn.Write(m)
@@ -64,8 +68,8 @@ func main() {
 		n, err := conn.Read(buf)
 		if err != nil {
 			log.Fatal("read error:", err)
-		}else{
-			fmt.Println(decodeHelloMsg(buf, n))
+		} else {
+			fmt.Println(decodeGameOpMsg(buf, n))
 		}
 	}
 }

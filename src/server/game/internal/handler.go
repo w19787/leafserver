@@ -1,29 +1,29 @@
 package internal
 
 import (
-	"github.com/golang/protobuf/proto"
+	"fmt"
+	// "github.com/golang/protobuf/proto"
 	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
 	"reflect"
 	"server/msg"
-	"fmt"
 )
 
-func init(){
+func init() {
 	fmt.Println("internal handler init")
-	handler(&msg.Hello{}, handleHello)
+	handler(&msg.GameOp{}, handleGameOp)
 }
 
-func handler(m interface{}, h interface {}){
+func handler(m interface{}, h interface{}) {
 	skeleton.RegisterChanRPC(reflect.TypeOf(m), h)
 }
 
-func handleHello(args []interface{}){
+func handleGameOp(args []interface{}) {
 	log.Debug("receive msg from client")
-	m := args[0].(*msg.Hello)
+	m := args[0].(*msg.GameOp)
 	a := args[1].(gate.Agent)
 
-	log.Debug("hello %v", m.GetName())
+	log.Debug("Op %v", m.GetOp())
 
-	a.WriteMsg(&msg.Hello{Name: proto.String("client back: hello")})
+	a.WriteMsg(&msg.GameOp{Op: m.GetOp()})
 }
