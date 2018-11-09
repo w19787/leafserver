@@ -1,73 +1,120 @@
-func (GR *GameRoom) Process() {
+package room
+
+import (
+	"server/game/player"
+)
+
+type MsgType int
+
+const (
+	MSG_JOIN MsgType = iota
+	MSG_WAIT_GAME
+	MSG_ON_GAME_START
+	MSG_ON_RO_JOIN
+	MSG_END_GAME
+	MSG_LEAVE
+)
+
+type RoomStatus int
+
+const (
+	STATUS_OPEN RoomStatus = iota
+	STATUS_PLAYING
+	STATUS_CLOSE
+)
+
+type Msg struct {
+	P player.Player
+	T MsgType
+}
+
+type GameRoom struct {
+	Size    int
+	MsgChan chan Msg
+	Status  RoomStatus
+	Uuid    int
+	Players []player.Player
+}
+
+func NewGameRoom(size int) *GameRoom {
+	gr := new(GameRoom)
+	gr.Size = size
+	gr.MsgChan = make(chan Msg)
+	gr.Status = STATUS_OPEN
+	gr.Players = make([]player.Player, 0, size)
+
+	return gr
+}
+
+func (gr *GameRoom) onJoin(p player.Player) bool {
+	if len(gr.Players) < gr.Size {
+		gr.Players = append(gr.Players, p)
+		return true
+	}
+
+	return false
+}
+
+func (gr *GameRoom) onLeave(p player.Player) {
+	for i := 0; i < len(gr.Players); i++ {
+		if gr.Players[i] == p {
+			gr.Players = append(gr.Players[:i], gr.Players[i+1:]...)
+			break
+		}
+	}
+}
+
+func (gr *GameRoom) startGame() {
+	gr.Status = STATUS_PLAYING
+}
+
+func (gr *GameRoom) endGame() {
+	gr.Status = STATUS_CLOSE
+
+}
+
+func (gr *GameRoom) Process() {
 	// 处理游戏过程结束/正常/异常
 	defer func() {
-		GR.End()
+		gr.endGame()
 		if e := recover(); e != nil {
 			panic(e)
 		}
 	}()
-	GR.Playing = true
-	gameStartTime := conf.GameConfig.StartTime
-	robotTime := conf.GameConfig.RobotTime
-Playing:
+
 	for {
 		select {
-		case m := <-GR.MsgChan:
+		case m := <-gr.MsgChan:
 			player := m.P
-			switch m.Mtype {
+			switch m.T {
 			case MSG_JOIN:
-				GR.onJoin(player)
-			case MSG_ANSWER:
-				GR.onAnswer(player, m.Answer, m.Pm)
-			}
-		case wf := <-GR.WaitChan:
-			switch wf {
-			case WAIT_GAME:
+				gr.onJoin(player)
+			case MSG_WAIT_GAME:
 				// 游戏开始倒计时，补充一部分AI
-				joinRobots(GR, utils.RandIntFrom2(18, 25))
-				// 等待是否补充足房间
-				time.AfterFunc(time.Second*time.Duration(robotTime), func() {
-					GR.WaitChan <- ON_RO_JOIN
-				})
-			case ON_RO_JOIN:
+				// joinRobots(gr, utils.RandIntFrom2(18, 25))
+				// // 等待是否补充足房间
+				// time.AfterFunc(time.Second*time.Duration(robotTime), func() {
+				// 	gr.MsgChan <- ON_RO_JOIN
+				// })
+			case MSG_ON_RO_JOIN:
 				// 不足AI
-				joinRobots(GR, 0)
-				// 剩余倒计时
-				time.AfterFunc(time.Second*time.Duration(gameStartTime-robotTime), func() {
-					GR.WaitChan <- ON_GAME_START
-				})
-			case ON_GAME_START:
+				// joinRobots(gr, 0)
+				// // 剩余倒计时
+				// time.AfterFunc(time.Second*time.Duration(gameStartTime-robotTime), func() {
+				// 	gr.MsgChan <- ON_GAME_START
+				// })
+			case MSG_ON_GAME_START:
 				// 游戏开始
-				GR.Start()
-			case ON_RO_ANS_1:
-				// 机器人第一次回答
-				helpRobotAnswer(GR, true, false)
-				time.AfterFunc(time.Second*time.Duration(1), func() {
-					GR.WaitChan <- ON_RO_ANS_2
-				})
-			case ON_RO_ANS_2:
-				// 机器人第二次回答
-				helpRobotAnswer(GR, false, false)
-				time.AfterFunc(time.Second*time.Duration(1), func() {
-					GR.WaitChan <- ON_RO_ANS_3
-				})
-			case ON_RO_ANS_3:
-				helpRobotAnswer(GR, false, true)
-				// 倒计时回答结束
-				time.AfterFunc(time.Second*time.Duration(GR.AnswerTimeout-4), func() {
-					GR.WaitChan <- ON_ANSWER_END
-				})
-			case ON_ANSWER_END: // 回答结束，结算
-				GR.onAnswerOver()
-			case ON_SEND_QUESTION: // 出题
-				GR.sendQuestion()
+				gr.startGame()
+
+			case MSG_LEAVE:
+				gr.onLeave(player)
+
 			case MSG_END_GAME: // 游戏结束
 				//break game
-				break Playing
-				// goto END
+				break
 			}
 		}
 	}
-	//END:
-	log.Debug("Game goroutine over ->%s", GR.Uuid)
+
 }
