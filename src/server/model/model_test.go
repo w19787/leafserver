@@ -1,28 +1,28 @@
 package model
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestDb(t *testing.T) {
-	orm := db
+func TestUserNew(t *testing.T) {
+	u := User{Mobile: "1234567", Name: "Alex", Age: 20, Password: "2345"}
+	ret := u.New()
 
-	_, err := orm.Insert(&User{Name: "xlw"})
-	if err != nil {
-		fmt.Println(err)
-		return
+	if !ret {
+		t.Error("create user error")
+	}
+}
+
+func TestUserQueryByMobile(t *testing.T) {
+	u := User{Mobile: "1234567", Name: "Alex", Age: 20, Password: "2345"}
+	ret := u.New()
+
+	if !ret {
+		t.Error("create user error")
 	}
 
-	u := new(User)
-	has, err := orm.ID(1).Get(u)
-	fmt.Println(has, err)
-	fmt.Println(u.Created)
-	fmt.Println(u.Name)
-
-	u2 := new(User)
-	has, err = orm.ID(3).Get(u2)
-	fmt.Println(has, err)
-	fmt.Println(u2.Created)
-	fmt.Println(u2.Name)
+	u1 := u.QuerryUserByMobile()
+	if u1.Name != "Alex" {
+		t.Error("Query user error")
+	}
 }
