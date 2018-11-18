@@ -12,7 +12,7 @@ type DBEngineConfig struct {
 
 var ProductDBConfig = DBEngineConfig{
 	Driver:     "mysql",
-	DataSource: "root@/xorm_test?charset=utf8",
+	DataSource: "root@/game_login?charset=utf8",
 }
 
 var TestDBConfig = DBEngineConfig{
