@@ -8,14 +8,15 @@ import (
 )
 
 type User struct {
-	Id       int64
-	Name     string
-	Age      int
-	Sex      string
-	Password string    `xorm:"varchar(64)"`
-	Mobile   string    `xorm:"varchar(32)"`
-	Created  time.Time `xorm:"created"`
-	Updated  time.Time `xorm:"updated"`
+	Id             int64     `xorm:"id"`
+	Name           string    `xorm:"name"`
+	Age            int       `xorm:"age"`
+	Sex            string    `xorm:"sex"`
+	HashedPassword string    `xorm:"password varchar(64)"`
+	Mobile         string    `xorm:"mobile unique varchar(32)"`
+	Created        time.Time `xorm:"created"`
+	Updated        time.Time `xorm:"updated"`
+	password       string    `xorm:"-"`
 }
 
 func init() {
@@ -26,8 +27,7 @@ func init() {
 }
 
 func (u *User) New() bool {
-	passwd := u.Password
-	u.Password = utils.HashAndSalt([]byte(passwd))
+	u.HashedPassword = utils.HashAndSalt([]byte(u.password))
 
 	_, err := db.Insert(u)
 	if err != nil {
@@ -39,7 +39,7 @@ func (u *User) New() bool {
 }
 
 func (u *User) QuerryUserByMobile() User {
-	user := User{}
+	var user User
 	_, err := db.Where("Mobile = ?", u.Mobile).Desc("id").Get(&user)
 
 	if err != nil {
@@ -47,4 +47,21 @@ func (u *User) QuerryUserByMobile() User {
 	}
 
 	return user
+}
+
+func (u *User) HasRegistered() bool {
+	var user User
+	has, err := db.Where("Mobile = ?", u.Mobile).Desc("id").Get(&user)
+	if err != nil {
+		log.Fatalf("Fail to query user: %v\n", err)
+	}
+
+	if has {
+		hashedPasswd := utils.HashAndSalt([]byte(u.password))
+		if utils.ComparePasswords(hashedPasswd, []byte(u.password)) {
+			return true
+		}
+	}
+
+	return false
 }

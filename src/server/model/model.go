@@ -11,7 +11,7 @@ import (
 var db *xorm.Engine
 
 func init() {
-	if flag.Lookup("test.v") == nil {
+	if flag.Lookup("test.v") != nil {
 		fmt.Println("testing mode")
 		db = newEngine(conf.TestDBConfig)
 	} else {
