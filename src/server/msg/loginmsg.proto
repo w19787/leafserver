@@ -3,6 +3,14 @@ syntax = "proto3";
 package msg;
 
 message LoginMsg {
-	string user_name = 1;
-	string user_password = 2;
+	string mobile = 1;
+	string password = 2;
+}
+
+message RegisterMsg {
+	string name = 1;
+	string mobile = 2;
+	string password = 3;
+	string confirmed_password = 4;
+	string sex = 5;
 }
