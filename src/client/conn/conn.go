@@ -1,35 +1,36 @@
 package conn
 
 import (
+	"fmt"
 	"net"
 	"strconv"
-	"fmt"
 )
 
-type LoginServer struct{
+type Server struct {
 	ServerType string
-	Server string
-	Port int
-	conn net.Conn
+	Server     string
+	Port       int
+	conn       net.Conn
 }
 
-func (s *LoginServer) Connect() bool{
-	host := s.Server + strconv.Itoa(s.Port)
-	s.conn, err := net.Dial(s.ServerType, host)
+func (s *Server) Connect() bool {
+	host := s.Server + ":" + strconv.Itoa(s.Port)
+	conn, err := net.Dial(s.ServerType, host)
 
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		return false
+	} else {
+		s.conn = conn
 	}
 
 	return true
 }
 
-func (s *LoginServer) Write(data []byte){
+func (s *Server) Write(data []byte) {
 	s.conn.Write(data)
 }
 
-func (s *LoginServer) Read(buf []byte) (int, error){
+func (s *Server) Read(buf []byte) (int, error) {
 	return s.conn.Read(buf)
 }
-
