@@ -1,9 +1,7 @@
 package msg
 
 import (
-	"fmt"
 	"github.com/name5566/leaf/network/protobuf"
-	"reflect"
 )
 
 var Processor = protobuf.NewProcessor()

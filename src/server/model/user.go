@@ -16,7 +16,7 @@ type User struct {
 	Mobile         string    `xorm:"mobile unique varchar(32)"`
 	Created        time.Time `xorm:"created"`
 	Updated        time.Time `xorm:"updated"`
-	password       string    `xorm:"-"`
+	Password       string    `xorm:"-"`
 }
 
 func init() {
@@ -27,7 +27,7 @@ func init() {
 }
 
 func (u *User) New() bool {
-	u.HashedPassword = utils.HashAndSalt([]byte(u.password))
+	u.HashedPassword = utils.HashAndSalt([]byte(u.Password))
 
 	_, err := db.Insert(u)
 	if err != nil {
@@ -57,8 +57,8 @@ func (u *User) HasRegistered() bool {
 	}
 
 	if has {
-		hashedPasswd := utils.HashAndSalt([]byte(u.password))
-		if utils.ComparePasswords(hashedPasswd, []byte(u.password)) {
+		hashedPasswd := utils.HashAndSalt([]byte(u.Password))
+		if utils.ComparePasswords(hashedPasswd, []byte(u.Password)) {
 			return true
 		}
 	}
