@@ -24,7 +24,7 @@ func online_register(s *conn.Server, name string, mp string, password string) bo
 	fmt.Println("received server rsp, decoding...")
 	rsp, err := cmsg.DecodeMsg(buf[2:n])
 
-	client_msg := rsp.(smsg.ClientMsg)
+	client_msg := rsp.(*smsg.ClientMsg)
 
 	if err == nil && client_msg.StatusCode == 200 {
 		return true

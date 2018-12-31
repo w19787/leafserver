@@ -40,7 +40,7 @@ func authenticate(s *conn.Server, mp string, password string) bool {
 
 	rsp, err := cmsg.DecodeMsg(buf[2:n])
 
-	rsp_msg := rsp.(smsg.ClientMsg)
+	rsp_msg := rsp.(*smsg.ClientMsg)
 
 	if err == nil && rsp_msg.StatusCode == 200 {
 		return true
