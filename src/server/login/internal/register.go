@@ -11,7 +11,7 @@ func handleRegister(args []interface{}) {
 	m := args[0].(*msg.RegisterMsg)
 	a := args[1].(gate.Agent)
 
-	fmt.Println("receive client register req: %s", m.Name)
+	fmt.Println("receive client register req: ", m.Name)
 
 	u := model.User{Mobile: m.Mobile, Name: m.Name, Password: m.Password}
 	ret := u.New()

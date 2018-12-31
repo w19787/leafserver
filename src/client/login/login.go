@@ -30,7 +30,7 @@ func connectServer() *conn.Server {
 func authenticate(s *conn.Server, mp string, password string) bool {
 
 	loginMsg := smsg.LoginMsg{Mobile: mp, Password: password}
-	s.Write(cmsg.EncodeMsg(loginMsg))
+	s.Write(cmsg.EncodeMsg(&loginMsg))
 	buf := make([]byte, 128)
 	n, err := s.Read(buf)
 
@@ -53,13 +53,15 @@ func Login() bool {
 	var mobile_phone string
 	var password string
 
-	_, err := fmt.Scanf("Mobile Phone: %s", &mobile_phone)
+	fmt.Println("Mobile Phone: ")
+	_, err := fmt.Scanf("%s", &mobile_phone)
 
 	if err != nil {
 		log.Fatal("Mobile input Error: ", err)
 	}
 
-	_, err = fmt.Scanf("Password: %s", &password)
+	fmt.Println("Password: ")
+	_, err = fmt.Scanf("%s", &password)
 
 	if err != nil {
 		log.Fatal("Password input Error: ", err)

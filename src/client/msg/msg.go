@@ -28,7 +28,7 @@ func init() {
 }
 
 func EncodeMsg(msgBody interface{}) []byte {
-	fmt.Println("start encoding msg: %T", msgBody)
+	fmt.Println("start encoding msg: ", msgBody)
 	data, err := Processor.Marshal(msgBody)
 	if err != nil {
 		log.Fatal("marshaling error: ", err)

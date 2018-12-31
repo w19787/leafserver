@@ -2,6 +2,7 @@ package model
 
 import (
 	// _ "github.com/mattn/go-sqlite3"
+	"fmt"
 	"log"
 	"server/utils"
 	"time"
@@ -57,8 +58,7 @@ func (u *User) HasRegistered() bool {
 	}
 
 	if has {
-		hashedPasswd := utils.HashAndSalt([]byte(u.Password))
-		if utils.ComparePasswords(hashedPasswd, []byte(u.Password)) {
+		if utils.ComparePasswords(user.HashedPassword, []byte(u.Password)) {
 			return true
 		}
 	}
